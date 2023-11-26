@@ -19,7 +19,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 st.sidebar.title("Give me an image and I will tell a story on it")
-st.title("Image Tale")
+st.image("img-tale.png")
 img_file=st.sidebar.file_uploader("Upload an image",type=['png','jpg','jpeg'])
 def response(objs,gen,temper,acc):
     resp=co.chat(
