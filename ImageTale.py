@@ -96,6 +96,7 @@ if img_file is not None:
         st.markdown("---")
 
         st.sidebar.caption('Note: Vocal output consumes more time')
+        st.sidebar.caption('Note: The app is currently in the evolving phase, it doesn't write stories on many objects. Kindly bear with the errors')
         submit=st.sidebar.button("Generate Story")
 
         st.write("### Your story")
