@@ -86,7 +86,7 @@ if img_file is not None:
             obj=obj+i+', '
         st.sidebar.markdown("---")
         st.sidebar.markdown("## Customize your story")
-        lisy=sorted(["Horror","Kids","Comedy","Fiction","Romance","Action","Sci-fi","Thriller","Drama","Crime","Fantasy","Adventure","Animation","Biography","Family","History","Musical","Sport","Western"])
+        lisy=sorted(["Horror","Kids","Comedy","Fiction","Romance","Action","Sci-fi","Thriller","Drama","Crime","Fantasy","Adventure","Animation","Family","History","Musical","Sport","Western"])
         gen=st.sidebar.selectbox("Select a genre",lisy)
         tem=st.sidebar.select_slider("Select Creativity level",['very low','low','medium','high','very high'])
         clevel={"very low":0.5,"low":0.6,"medium":0.7,"high":0.85,"very high":1.0}
