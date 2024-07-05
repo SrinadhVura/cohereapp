@@ -11,29 +11,21 @@ from gtts import gTTS
 from io import BytesIO
 from pygame import mixer
 #streamlit image input
-co=cohere.Client(st.secrets["COHERE_API_KEY"] )
-st.set_page_config(
-    page_title="Image Tale",
-    page_icon="🦄",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
+co = cohere.Client(st.secrets["COHERE_API_KEY"]) # This is your trial API key
+
 st.sidebar.title("Give me an image and I will tell a story on it")
-st.image("img-tale.png")
+st.title("Image Tale")
 img_file=st.sidebar.file_uploader("Upload an image",type=['png','jpg','jpeg'])
-def response(objs,gen,temper,acc):
-    resp=co.chat(
-        model="command",
-        message=str(st.secrets["IMG_TALE"] )+" "+objs+" "+st.secrets["SELECTOR"]+" "+gen+" don't mention any metadata",
+def response(objs,gen,temper):
+    resp=co.generate(
+        model="c4ai-aya-23",
+        prompt=str(st.secrets["IMG_TALE"] )+" "+objs+" "+st.secrets["SELECTOR"]+" "+gen+" don't mention any metadata",
         temperature=temper,
-        chat_history=[],
-        prompt_truncation='auto',
-        stream=False,
-        citation_quality=acc,
-        connectors=[{"id":"web-search"}],
-        documents=[]
+        max_tokens=4096,
+        stop_sequences=[],
+        return_likelihoods='NONE'
     ) 
-    return resp
+    return resp.generations[0].text
 
 footer="""<style>
 a:link , a:visited{
@@ -79,6 +71,7 @@ if img_file is not None:
                                             score_threshold=0.5)
         detector = vision.ObjectDetector.create_from_options(options)
         res=detector.detect(mpimage)
+
         objects=[res.detections[i].categories[0].category_name for i in range(len(res.detections))]
         print(objects)
         obj=''
@@ -86,23 +79,22 @@ if img_file is not None:
             obj=obj+i+', '
         st.sidebar.markdown("---")
         st.sidebar.markdown("## Customize your story")
-        lisy=sorted(["Horror","Kids","Comedy","Fiction","Romance","Action","Sci-fi","Thriller","Drama","Crime","Fantasy","Adventure","Animation","Family","History","Musical","Sport","Western"])
+        lisy=sorted(["Horror","Kids","Comedy","Fiction","Romance","Action","Sci-fi","Thriller","Drama","Crime","Fantasy","Adventure","Animation","Biography","Family","History","Musical","Sport","Western"])
         gen=st.sidebar.selectbox("Select a genre",lisy)
         tem=st.sidebar.select_slider("Select Creativity level",['very low','low','medium','high','very high'])
         clevel={"very low":0.5,"low":0.6,"medium":0.7,"high":0.85,"very high":1.0}
-        quicker=st.sidebar.radio("Quicker response?",["Yes","No"])
-        qual={"Yes":'fast',"No":'accurate'}
         voice=st.sidebar.radio("Voice?",["Yes","No"])
         st.markdown("---")
 
         st.sidebar.caption('Note: Vocal output consumes more time')
-        st.sidebar.caption("Note: The app is currently in the evolving phase, it doesn't write stories on many objects. Kindly bear with the errors")
         submit=st.sidebar.button("Generate Story")
 
         st.write("### Your story")
         st.markdown("---")
         if submit:
-            story=response(obj,gen,clevel[tem],qual[quicker]).text
+            story=response(obj,gen,clevel[tem])
+            if len(objects)==0:
+                story=st.secrets["NO_DETECT"]+" "+story
             st.write(story)
             if voice=="Yes":
                 tts=gTTS(text=story,lang='en',slow=False, tld='co.in')
